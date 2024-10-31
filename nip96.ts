@@ -269,7 +269,7 @@ export async function readServerConfig(serverUrl: string): Promise<ServerConfigu
 export function validateFileUploadResponse(response: any): response is FileUploadResponse {
   if (typeof response !== 'object' || response === null) return false
 
-  if (!response.status || !response.message) {
+  if (!response.status) {
     return false
   }
 
@@ -385,17 +385,17 @@ export async function uploadFile(
     throw new Error('Unknown error in uploading file!')
   }
 
+  let parsedResponse
   try {
-    const parsedResponse = await response.json()
-
-    if (!validateFileUploadResponse(parsedResponse)) {
-      throw new Error('Invalid response from the server!')
-    }
-
-    return parsedResponse
+    parsedResponse = await response.json()
   } catch (error) {
     throw new Error('Error parsing JSON response!')
   }
+
+  if (!validateFileUploadResponse(parsedResponse)) {
+    throw new Error('Invalid response from the server!')
+  }
+  return parsedResponse
 }
 
 /**
